@@ -2,8 +2,8 @@
 #
 # For normal machines with ANSI compilers
 #CC= cc
-# For Suns or other non-ANSI platforms. 
-CC= gcc 
+# For Suns or other non-ANSI platforms.
+CC= gcc
 #CC = xlc
 QUANTIFY=/hdf2/pure/quantify-2.0.1-sunos4/quantify
 PURIFY=/hdf2/pure/purify-3.2-sunos4/purify
@@ -27,13 +27,13 @@ CFLAGS= -g
 
 #FCGI_CFLAGS = -DFCGI_SUPPORT -I/local/include
 
-# DIGEST AUTHENTICATION 
+# DIGEST AUTHENTICATION
 #
 # To enable Message Digest Authentication, define the DIGEST_AUTH flag
 
 MD5_CFLAGS = -DDIGEST_AUTH
 
-# KERBEROS 
+# KERBEROS
 #
 # If you want httpd to support Kerberos authentication, set the
 # following flags appropriately.  You can support Kerberos V4 and/or V5,
@@ -56,13 +56,13 @@ KRB5_CFLAGS = -DKRB5 -I$(KRB5_DIR)/include -I$(KRB5_DIR)/include/krb5
 #KRB_LIBS   = $(KRB4_LIBS) $(KRB5_LIBS)
 
 
-# DBM 
+# DBM
 #
 # To enable DBM password/groupfile support, define the DBM_SUPPORT flag
 
-DBM_CFLAGS = -DDBM_SUPPORT
+#DBM_CFLAGS = -DDBM_SUPPORT
 #DBM_LIBS = -lndbm
-#DBM_LIBS = -ldbm 
+#DBM_LIBS = -ldbm
 #DBM_LIBS = -lgdbm
 # For SVR4
 #DBM_CFLAGS = -I/usr/include -I/usr/ucbinclude
@@ -87,7 +87,7 @@ LFLAGS=  # -pg -DPROFILE
 # EXTRA_LIBS= -lresolv
 # For Solaris 2.x
 # AUX_CFLAGS= -DSOLARIS2
-# EXTRA_LIBS= -lsocket -lnsl 
+# EXTRA_LIBS= -lsocket -lnsl
 # For SGI IRIX. Use the EXTRA_LIBS line if you're using NIS and want
 # user-supported directories
 # AUX_CFLAGS= -DIRIX
@@ -143,7 +143,7 @@ LFLAGS=  # -pg -DPROFILE
 # AUX_CFLAGS= -DATTSVR3
 # EXTRA_LIBS= -lnet -lnsl_s -lgen
 # For QNX 4.22
-# AUX_CFLAGS= -Osax  -g1 -fi=unix.h -w4 -zc -5 
+# AUX_CFLAGS= -Osax  -g1 -fi=unix.h -w4 -zc -5
 # EXTRA_LIBS= -N 250k
 # For ConvexOS 10.1 with Convex C Compiler 5.0
 # AUX_CFLAGS= -DCONVEXOS -D__STDC__
@@ -152,8 +152,8 @@ LFLAGS=  # -pg -DPROFILE
 # -------------- You shouldn't have to edit anything else -----------------
 # -------------------------------------------------------------------------
 
-SEC_CFLAGS = $(MD5_CFLAGS) $(KRB_CFLAGS) 
-SEC_LIBS   = $(KRB_LIBS) 
+SEC_CFLAGS = $(MD5_CFLAGS) $(KRB_CFLAGS)
+SEC_LIBS   = $(KRB_LIBS)
 
 ALL_CFLAGS = $(CFLAGS) $(AUX_CFLAGS) $(SEC_CFLAGS) $(DBM_CFLAGS) $(FCGI_CFLAGS)
 ALL_LIBS = $(EXTRA_LIBS) $(SEC_LIBS) $(DBM_LIBS)
@@ -187,10 +187,10 @@ hp-cc:
 	make tar AUX_CFLAGS=-DHPUX CC=cc CFLAGS="-O -Aa" DBM_LIBS=-lndbm
 
 linux:
-	make tar AUX_CFLAGS=-DLINUX CC=gcc CFLAGS=-O2 DBM_LIBS=-lgdbm
+	make tar AUX_CFLAGS=-DLINUX CC=gcc CFLAGS=-O2 EXTRA_LIBS=-lcrypt DBM_LIBS=-lgdbm
 
 linux2: linux
-linux1: 
+linux1:
 	make tar AUX_CFLAGS="-DLINUX -DFD_LINUX" CC=gcc CFLAGS=-O2 DBM_LIBS=-lgdbm
 
 netbsd:
@@ -225,25 +225,25 @@ ultrix:
 httpd: $(OBJS)
 	$(CC) $(LFLAGS) -o httpd $(OBJS) $(ALL_LIBS)
 
-#	-logfile=/X11/blong/httpd/logs/pure_log 
+#	-logfile=/X11/blong/httpd/logs/pure_log
 purify: $(OBJS)
 	$(PURIFY) -program-name=/X11/blong/httpd/src/httpd \
 	          -follow-child-processes=yes \
-	$(CC) $(LFLAGS) -o httpd $(OBJS) $(ALL_LIBS) 
+	$(CC) $(LFLAGS) -o httpd $(OBJS) $(ALL_LIBS)
 
 quantify: $(OBJS)
 	$(QUANTIFY) -record-child-process-data=yes \
 		    -record-data=no \
 	            -avoid-recording-system-calls=1,6,93,113,114 \
-	$(CC) $(LFLAGS) -o httpd $(OBJS) $(ALL_LIBS) 
+	$(CC) $(LFLAGS) -o httpd $(OBJS) $(ALL_LIBS)
 
 tar: $(OBJS)
-	$(CC) $(LFLAGS) -o ../httpd $(OBJS) $(ALL_LIBS) 
+	$(CC) $(LFLAGS) -o ../httpd $(OBJS) $(ALL_LIBS)
 
 
 http_access.o:  Makefile config.h portability.h constants.h http_access.h \
 		http_request.h http_config.h http_auth.h http_mime.h \
-		util.h 
+		util.h
 http_alias.o:   config.h portability.h constants.h http_alias.h \
 		http_config.h util.h http_log.h
 http_auth.o:    Makefile config.h portability.h constants.h http_auth.h \
@@ -263,7 +263,7 @@ http_send.o:    config.h portability.h constants.h http_send.h \
 http_include.o: config.h portability.h constants.h http_include.h \
 		util.h http_mime.h http_log.h http_config.h http_request.h \
 		cgi.h http_access.h http_alias.h http_dir.h env.h
-http_ipc.o:     config.h portability.h constants.h http_ipc.h 
+http_ipc.o:     config.h portability.h constants.h http_ipc.h
 http_log.o:     config.h portability.h constants.h http_log.h \
 		http_request.h http_config.h http_auth.h http_mime.h util.h
 http_mime.o:    Makefile config.h portability.h constants.h http_mime.h \
@@ -285,7 +285,7 @@ httpd.o:        Makefile config.h portability.h constants.h httpd.h \
 util.o:         config.h portability.h constants.h util.h \
 		http_request.h http_config.h host_config.h http_log.h
 env.o:		config.h portability.h constants.h http_log.h env.h
-rfc931.o:	config.h portability.h 
+rfc931.o:	config.h portability.h
 open_logfile.o: config.h portability.h constants.h open_logfile.h \
 		http_config.h util.h
 allocate.o:	config.h portability.h constants.h host_config.h http_log.h \
@@ -307,5 +307,5 @@ SRC = $(OBJS:%.o=%.c)
 codecenter:
 	#setopt ansi
 	#setopt print_string 128
-	#setopt load_flags $(ALL_FLAGS) 
-	#load $(LFLAGS) $(SRC) $(ALL_LIBS) 
+	#setopt load_flags $(ALL_FLAGS)
+	#load $(LFLAGS) $(SRC) $(ALL_LIBS)
