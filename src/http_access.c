@@ -13,7 +13,7 @@
  * http_access.c,v 1.78 1996/04/05 18:54:49 blong Exp
  *
  ************************************************************************
- * 
+ *
  * http_access: Security options etc.
  *
  */
@@ -23,7 +23,7 @@
 #include "portability.h"
 
 #include <stdio.h>
-#ifndef NO_STDLIB_H 
+#ifndef NO_STDLIB_H
 # include <stdlib.h>
 #endif /* NO_STDLIB_H */
 #include <string.h>
@@ -45,13 +45,13 @@
  * match things like "allow csa.ncsa.uiuc.edu" and
  * a ncsa.uiuc.edu. SSG 7/10/95
  */
-int in_domain(char *domain, char *what) 
+int in_domain(char *domain, char *what)
 {
     int dl=strlen(domain);
     int wl=strlen(what);
 
     if(((wl-dl) >= 0) && !strcmp(domain,&what[wl-dl])) {
-	if (((wl - dl) > 0) && (*domain != '.') && (what[wl-dl-1] != '.')) 
+	if (((wl - dl) > 0) && (*domain != '.') && (what[wl-dl-1] != '.'))
 	    return 0;   /* only a partial match - SSG */
 	return 1;
     }
@@ -73,14 +73,14 @@ int in_domain(char *domain, char *what)
  * might like the ability to allow anything that matches 128.174.1
  * blong - 1/26/96
  */
-int in_ip(char *domain, char *what) 
+int in_ip(char *domain, char *what)
 {
 /*   int dl=strlen(domain);
 
    return (!strncmp(domain,what,dl)) &&
             (domain[dl-1]=='.' &&  strlen(what)<=dl &&   what[dl]=='.'); */
 
-   return(!strncmp(domain,what,strlen(domain))); 
+   return(!strncmp(domain,what,strlen(domain)));
 }
 
 /* find_host_allow()
@@ -88,7 +88,7 @@ int in_ip(char *domain, char *what)
  * As soon as it finds an allow that matches, it returns 1
  */
 
-int find_host_allow(per_request *reqInfo, int x) 
+int find_host_allow(per_request *reqInfo, int x)
 {
     register int y;
 
@@ -97,12 +97,12 @@ int find_host_allow(per_request *reqInfo, int x)
         return FA_ALLOW;
 
     for(y=0;y<sec[x].num_allow[reqInfo->method];y++) {
-        if(!strcmp("all",sec[x].allow[reqInfo->method][y])) 
+        if(!strcmp("all",sec[x].allow[reqInfo->method][y]))
             return FA_ALLOW;
 #ifdef LOCALHACK
         if((!strcmp("LOCAL",sec[x].allow[reqInfo->method][y])) &&
                  reqInfo->remote_host &&
-		  (ind(reqInfo->remote_host,'.') == -1)) 
+		  (ind(reqInfo->remote_host,'.') == -1))
 	 {
 	    reqInfo->bSatisfiedDomain = TRUE;
 	    return FA_ALLOW;
@@ -116,7 +116,7 @@ int find_host_allow(per_request *reqInfo, int x)
 	/* If we haven't done a lookup, and the DNS type is Minimum, then
 	 * we do a lookup now
 	 */
-	if (!reqInfo->dns_host_lookup && 
+	if (!reqInfo->dns_host_lookup &&
 	   (reqInfo->hostInfo->dns_mode == DNS_MIN))
 	     get_remote_host_min(reqInfo);
         if(reqInfo->remote_host) {
@@ -135,17 +135,17 @@ int find_host_allow(per_request *reqInfo, int x)
  * Hunts down list of denied hosts and returns 0 if denied, 1 if not
  * As soon as it finds a deny that matches, it returns 0
  */
-int find_host_deny(per_request *reqInfo, int x) 
+int find_host_deny(per_request *reqInfo, int x)
 {
     register int y;
 
-    /* If there aren't any denies, then it is allowed 
+    /* If there aren't any denies, then it is allowed
      */
     if(sec[x].num_deny[reqInfo->method] == 0)
         return FA_ALLOW;
 
     for(y=0;y<sec[x].num_deny[reqInfo->method];y++) {
-        if(!strcmp("all",sec[x].deny[reqInfo->method][y])) 
+        if(!strcmp("all",sec[x].deny[reqInfo->method][y]))
 	  {
 	    reqInfo->bSatisfiedDomain = FALSE;
 	    return FA_DENY;
@@ -164,7 +164,7 @@ int find_host_deny(per_request *reqInfo, int x)
 	    reqInfo->bSatisfiedDomain = FALSE;
 	    return FA_DENY;
 	  }
-	if (!reqInfo->dns_host_lookup && 
+	if (!reqInfo->dns_host_lookup &&
 	   (reqInfo->hostInfo->dns_mode == DNS_MIN))
 	     get_remote_host_min(reqInfo);
         if(reqInfo->remote_host) {
@@ -183,8 +183,8 @@ int find_host_deny(per_request *reqInfo, int x)
 /* match_referer()
  * currently matches restriction with sent for only as long as restricted
  */
-int match_referer(char *restrict, char *sent) {
-  return !(strcmp_match(sent,restrict));
+int match_referer(char * restrict_, char * sent) {
+  return !(strcmp_match(sent, restrict_));
 }
 
 /* find_referer_allow()
@@ -257,10 +257,10 @@ int find_referer_deny(per_request *reqInfo, int x)
 
 
 
-void check_dir_access(per_request *reqInfo,int x, 
-		      int *allow, int *allow_options, int *other) 
+void check_dir_access(per_request *reqInfo,int x,
+		      int *allow, int *allow_options, int *other)
 {
-    if(sec[x].auth_name[0]) 
+    if(sec[x].auth_name[0])
 	reqInfo->auth_name = sec[x].auth_name;
     if(sec[x].auth_pwfile[0]) {
         reqInfo->auth_pwfile = sec[x].auth_pwfile;
@@ -281,13 +281,13 @@ void check_dir_access(per_request *reqInfo,int x,
 
     if(sec[x].order[reqInfo->method] == ALLOW_THEN_DENY) {
         *allow=FA_DENY;
-	if ((find_host_allow(reqInfo,x) == FA_ALLOW) && 
+	if ((find_host_allow(reqInfo,x) == FA_ALLOW) &&
 	    (find_referer_allow(reqInfo,x) == FA_ALLOW))
            *allow = FA_ALLOW;
 	if ((find_host_deny(reqInfo,x) == FA_DENY) ||
 	    (find_referer_deny(reqInfo,x) == FA_DENY))
            *allow = FA_DENY;
-    } 
+    }
     else if(sec[x].order[reqInfo->method] == DENY_THEN_ALLOW) {
 	if ((find_host_deny(reqInfo,x) == FA_DENY) ||
 	    (find_referer_deny(reqInfo,x) == FA_DENY))
@@ -304,14 +304,14 @@ void check_dir_access(per_request *reqInfo,int x,
 	  !(find_referer_deny(reqInfo,x) == FA_DENY))
             *allow = FA_ALLOW;
     }
-   
+
     if(sec[x].num_auth[reqInfo->method])
         *allow_options=x;
-      
+
 }
 
 void evaluate_access(per_request *reqInfo,struct stat *finfo,int *allow,
-		     char *allow_options) 
+		     char *allow_options)
 {
     int will_allow, need_auth, num_dirs;
     int need_enhance;
@@ -320,14 +320,14 @@ void evaluate_access(per_request *reqInfo,struct stat *finfo,int *allow,
     char errstr[MAX_STRING_LEN];
     register int x,y,z,n;
 
-    if(S_ISDIR(finfo->st_mode)) 
+    if(S_ISDIR(finfo->st_mode))
       strncpy_dir(path,reqInfo->filename,MAX_STRING_LEN);
     else lim_strcpy(path,reqInfo->filename,MAX_STRING_LEN);
-    
+
     no2slash(path);
 
     num_dirs = count_dirs(path);
-    will_allow = FA_ALLOW; 
+    will_allow = FA_ALLOW;
     need_auth = -1;
     need_enhance = -1;
 
@@ -342,7 +342,7 @@ void evaluate_access(per_request *reqInfo,struct stat *finfo,int *allow,
 
     /* assume not domain restricted */
     reqInfo->bSatisfiedDomain = 0;
-    
+
     n=num_dirs-1;
     for(x=0;x<num_sec;x++) {
         if(is_matchexp(sec[x].d)) {
@@ -367,14 +367,14 @@ void evaluate_access(per_request *reqInfo,struct stat *finfo,int *allow,
 	  strcpy(reqInfo->outh_location,sec[x].on_deny[reqInfo->method]);
         }
     }
-    if((override[n]) || (!(opts[n] & OPT_SYM_LINKS)) || 
+    if((override[n]) || (!(opts[n] & OPT_SYM_LINKS)) ||
        (opts[n] & OPT_SYM_OWNER)) {
 	for(x=0;x<num_dirs;x++) {
 	    y = num_sec;
 	    make_dirstr(path,x+1,d);
 	    if((!(opts[x] & OPT_SYM_LINKS)) || (opts[x] & OPT_SYM_OWNER)) {
 		struct stat lfi,fi;
-		
+
 		if(lstat(d,&lfi) != 0)
 		{
 		    sprintf(errstr,"HTTPd: can't lstat %s, errno = %d",d, errno);
@@ -414,7 +414,7 @@ void evaluate_access(per_request *reqInfo,struct stat *finfo,int *allow,
 			    opts[z] = sec[y].opts;
 			override[z] = sec[y].override;
 		    }
-		    if ((sec[y].num_auth[reqInfo->method] > 0) || 
+		    if ((sec[y].num_auth[reqInfo->method] > 0) ||
 			(sec[y].num_allow[reqInfo->method] > 0) ||
 			(sec[y].num_deny[reqInfo->method] > 0) ||
 			(sec[y].num_referer_allow[reqInfo->method] > 0) ||
@@ -423,12 +423,12 @@ void evaluate_access(per_request *reqInfo,struct stat *finfo,int *allow,
 	                if (!will_allow && sec[y].on_deny[reqInfo->method]) {
 	                  strcpy(reqInfo->outh_location,
 				 sec[y].on_deny[reqInfo->method]);
-       			} 
+       			}
 		}
 	    }
 	}
     }
-    if((!(S_ISDIR(finfo->st_mode))) && 
+    if((!(S_ISDIR(finfo->st_mode))) &&
        ((!(opts[n] & OPT_SYM_LINKS)) || (opts[n] & OPT_SYM_OWNER))) {
         struct stat fi,lfi;
         if(lstat(path,&fi)!=0)
@@ -477,7 +477,7 @@ void evaluate_access(per_request *reqInfo,struct stat *finfo,int *allow,
     else *allow_options = 0;
 }
 
-void kill_security(void) 
+void kill_security(void)
 {
     register int x,y,m;
 
@@ -513,10 +513,10 @@ void kill_security(void)
 
 
 /* This function should reset the security data structure to contain only
-   the information given in the access configuration file.  It should be 
+   the information given in the access configuration file.  It should be
    called after any transactions */
 
-void reset_security(void) 
+void reset_security(void)
 {
     register int x,y,m;
 
@@ -551,4 +551,3 @@ void reset_security(void)
 
    num_sec = num_sec_config;
 }
-

@@ -210,7 +210,7 @@ typedef int mode_t;
 #endif
 /* Needed for newer versions of libc (5.2.x) to use FD_LINUX hack */
 #define DIRENT_ILLEGAL_ACCESS
-#define DIR_FILENO(p)  ((p)->dd_fd)
+#define DIR_FILENO(p)  (dirfd(p))
 #define CMSG_DATA(cmptr)  ((cmptr)->cmsg_data)
 #define NEED_SYS_UN_H
 #undef BSD
@@ -398,14 +398,14 @@ extern char *getenv();
 #endif /* defined(__mc68000__) */
 
 /* If we haven't set anything about file descriptor passing, set NO_PASS */
-#if !defined(FD_BSD) && !defined(FD_SYSV) && !defined(FD_LINUX) && !defined(NO_PASS) 
+#if !defined(FD_BSD) && !defined(FD_SYSV) && !defined(FD_LINUX) && !defined(NO_PASS)
 # define NO_PASS
 #endif /* !defined(FD_BSD) && !defined(FD_SYSV) && !defined(NO_PASS) */
 
 /*
  * The particular directory style your system supports. If you have dirent.h
- * in /usr/include (POSIX) or /usr/include/sys (SYSV), #include 
- * that file and define DIR_TYPE to be dirent. Otherwise, if you have 
+ * in /usr/include (POSIX) or /usr/include/sys (SYSV), #include
+ * that file and define DIR_TYPE to be dirent. Otherwise, if you have
  * /usr/include/sys/dir.h, define DIR_TYPE to be direct and include that
  * file. If you have neither, I'm confused.
  */
@@ -428,7 +428,7 @@ extern char *getenv();
 #ifndef JMP_BUF
 # define JMP_BUF sigjmp_buf
 #endif /* JMP_BUF */
-        
+
 #ifndef NeXT
 # include <unistd.h>
 #endif /* NeXT */
@@ -438,7 +438,7 @@ extern char *getenv();
 #endif /* MAX_PATHLEN */
 
 /* Some systems prefer sockaddr_in for some functions, and sock_addr
-   for others 
+   for others
  */
 typedef struct sockaddr_in SERVER_SOCK_ADDR;
 #ifdef MIX_SOCKADDR
